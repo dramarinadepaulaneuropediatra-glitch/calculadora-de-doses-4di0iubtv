@@ -32,7 +32,7 @@ export default function Layout() {
             </div>
             <div className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400">
               <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">
-                Unidade Neonatal - Hospital Júlia Kubitischek - FHEMIG
+                Unidade Neonatal - Hospital Júlia Kubitschek - FHEMIG
               </p>
               <p>Elaborador: [Nome do Elaborador]</p>
             </div>

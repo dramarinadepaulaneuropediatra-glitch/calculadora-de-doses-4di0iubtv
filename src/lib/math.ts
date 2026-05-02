@@ -17,12 +17,14 @@ export function calculateConversion(
   targetDrug: Drug,
   targetRoute: Route,
   targetInterval: number,
+  isSourceContinuous: boolean = sourceRoute === 'iv',
 ): CalculationResult | null {
   if (!weight || weight <= 0 || !sourceDoseMcg || sourceDoseMcg <= 0) return null
 
   // 1. Calculate Daily Source Dose in mcg per kg
-  const sourceDailyMcg =
-    sourceRoute === 'iv' ? sourceDoseMcg * 24 : sourceDoseMcg * (24 / sourceInterval)
+  const sourceDailyMcg = isSourceContinuous
+    ? sourceDoseMcg * 24
+    : sourceDoseMcg * (24 / sourceInterval)
 
   // 2. Convert to Daily Morphine IV Equivalent (mg per kg)
   let mIvDailyMg = 0

@@ -29,11 +29,21 @@ export default function Index() {
   const [sDrug, setSDrug] = useState<Drug>((searchParams.get('sd') as Drug) || 'fentanyl')
   const [sRoute, setSRoute] = useState<Route>((searchParams.get('sr') as Route) || 'iv')
   const [sDose, setSDose] = useState(searchParams.get('sdo') || '')
+  const [sUnit, setSUnit] = useState(searchParams.get('su') || 'mcg/Kg/h')
   const [sInterval, setSInterval] = useState(searchParams.get('si') || '4')
 
   const [tDrug, setTDrug] = useState<Drug>((searchParams.get('td') as Drug) || 'morphine')
   const [tRoute, setTRoute] = useState<Route>((searchParams.get('tr') as Route) || 'po')
   const [tInterval, setTInterval] = useState(searchParams.get('ti') || '6')
+
+  // Adjust sUnit based on route when route changes
+  useEffect(() => {
+    if (sRoute === 'po' && !sUnit.includes('dose')) {
+      setSUnit('mg/Kg/dose')
+    } else if (sRoute === 'iv' && sUnit === 'mcg/Kg/dose') {
+      setSUnit('mcg/Kg/h')
+    }
+  }, [sRoute, sUnit])
 
   // Sync state to URL for sharing
   useEffect(() => {
@@ -42,12 +52,13 @@ export default function Index() {
     params.set('sd', sDrug)
     params.set('sr', sRoute)
     if (sDose) params.set('sdo', sDose)
-    if (sRoute === 'po') params.set('si', sInterval)
+    if (sUnit) params.set('su', sUnit)
+    if (sUnit.includes('dose')) params.set('si', sInterval)
     params.set('td', tDrug)
     params.set('tr', tRoute)
     if (tRoute === 'po') params.set('ti', tInterval)
     setSearchParams(params, { replace: true })
-  }, [weight, sDrug, sRoute, sDose, sInterval, tDrug, tRoute, tInterval, setSearchParams])
+  }, [weight, sDrug, sRoute, sDose, sUnit, sInterval, tDrug, tRoute, tInterval, setSearchParams])
 
   // Enforce Fentanyl IV only
   useEffect(() => {
@@ -56,17 +67,22 @@ export default function Index() {
   }, [sDrug, tDrug])
 
   const result = useMemo(() => {
+    const parsedDose = parseFloat(sDose)
+    const doseInMcg = sUnit.startsWith('mg') ? parsedDose * 1000 : parsedDose
+    const isSourceContinuous = sUnit.includes('/h')
+
     return calculateConversion(
       parseFloat(weight),
       sDrug,
       sRoute,
-      parseFloat(sDose),
+      doseInMcg,
       parseInt(sInterval),
       tDrug,
       tRoute,
       parseInt(tInterval),
+      isSourceContinuous,
     )
-  }, [weight, sDrug, sRoute, sDose, sInterval, tDrug, tRoute, tInterval])
+  }, [weight, sDrug, sRoute, sDose, sUnit, sInterval, tDrug, tRoute, tInterval])
 
   // Save to history automatically when a valid result exists
   useEffect(() => {
@@ -77,7 +93,7 @@ export default function Index() {
           id: Date.now().toString(),
           date: new Date().toISOString(),
           weight,
-          source: `${formatDrugName(sDrug)} ${sRoute.toUpperCase()} ${sDose} ${sRoute === 'iv' ? 'mcg/Kg/h' : 'mcg/Kg/dose'}`,
+          source: `${formatDrugName(sDrug)} ${sRoute.toUpperCase()} ${sDose} ${sUnit}`,
           target: `${formatDrugName(tDrug)} ${tRoute.toUpperCase()}`,
           resultRelative: `${result.relativeMcg} mcg/Kg/${tRoute === 'iv' ? 'h' : 'dose'}`,
           resultAbsolute: `${result.absoluteMg} mg/${tRoute === 'iv' ? 'h' : 'dose'}`,
@@ -97,11 +113,12 @@ export default function Index() {
       }, 1500)
       return () => clearTimeout(timeoutId)
     }
-  }, [result, weight, sDose, sDrug, sRoute, tDrug, tRoute])
+  }, [result, weight, sDose, sUnit, sDrug, sRoute, tDrug, tRoute])
 
   const copyPrescription = () => {
     if (!result) return
-    const sourceText = `${formatDrugName(sDrug)} ${sRoute.toUpperCase()} ${sDose} ${sRoute === 'iv' ? 'mcg/Kg/h' : `mcg/Kg/dose (${24 / parseInt(sInterval)}x/dia)`}`
+    const isSourceContinuous = sUnit.includes('/h')
+    const sourceText = `${formatDrugName(sDrug)} ${sRoute.toUpperCase()} ${sDose} ${sUnit} ${!isSourceContinuous ? `(${24 / parseInt(sInterval)}x/dia)` : ''}`
     const targetText = `${formatDrugName(tDrug)} ${tRoute.toUpperCase()} ${result.absoluteMg} mg/${tRoute === 'iv' ? 'h' : `dose de ${tInterval}/${tInterval}h`} (${result.relativeMcg} mcg/Kg/${tRoute === 'iv' ? 'h' : 'dose'})`
 
     const text = `Transição Opioide SAN\nPeso: ${weight} Kg\nDe: ${sourceText}\nPara: ${targetText}`
@@ -115,10 +132,11 @@ export default function Index() {
     })
   }
 
-  const sUnitPrimary = sRoute === 'iv' ? 'mcg/Kg/h' : 'mcg/Kg/dose'
   const tUnitPrimary = tRoute === 'iv' ? 'mcg/Kg/h' : 'mcg/Kg/dose'
   const tUnitSecondary = tRoute === 'iv' ? 'mg/Kg/h' : 'mg/Kg/dose'
   const tUnitAbs = tRoute === 'iv' ? 'h' : 'dose'
+
+  const isSourceContinuous = sUnit.includes('/h')
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
@@ -188,7 +206,7 @@ export default function Index() {
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="iv" id="s-iv" />
                       <Label htmlFor="s-iv" className="flex items-center gap-1 cursor-pointer">
-                        <Syringe className="w-4 h-4 text-slate-400" /> IV (Contínua)
+                        <Syringe className="w-4 h-4 text-slate-400" /> IV (Contínua/Int.)
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -205,20 +223,40 @@ export default function Index() {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-600 dark:text-slate-400">
-                      Dose <span className="font-normal opacity-70">({sUnitPrimary})</span>
-                    </Label>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      placeholder="Ex: 2.5"
-                      value={sDose}
-                      onChange={(e) => setSDose(e.target.value)}
-                      className="font-medium"
-                    />
+                    <Label className="text-slate-600 dark:text-slate-400">Dose</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="Ex: 2.5"
+                        value={sDose}
+                        onChange={(e) => setSDose(e.target.value)}
+                        className="font-medium flex-1 min-w-[80px]"
+                      />
+                      <Select value={sUnit} onValueChange={setSUnit}>
+                        <SelectTrigger className="w-[140px] flex-shrink-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sRoute === 'po' ? (
+                            <>
+                              <SelectItem value="mcg/Kg/dose">mcg/Kg/dose</SelectItem>
+                              <SelectItem value="mg/Kg/dose">mg/Kg/dose</SelectItem>
+                            </>
+                          ) : (
+                            <>
+                              <SelectItem value="mcg/Kg/h">mcg/Kg/h</SelectItem>
+                              <SelectItem value="mg/Kg/h">mg/Kg/h</SelectItem>
+                              <SelectItem value="mcg/Kg/dose">mcg/Kg/dose</SelectItem>
+                              <SelectItem value="mg/Kg/dose">mg/Kg/dose</SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  {sRoute === 'po' && (
+                  {!isSourceContinuous && (
                     <div className="space-y-2 animate-fade-in">
                       <Label className="text-slate-600 dark:text-slate-400">Intervalo</Label>
                       <Select value={sInterval} onValueChange={setSInterval}>
