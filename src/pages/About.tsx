@@ -4,13 +4,15 @@ import { Separator } from '@/components/ui/separator'
 export default function About() {
   return (
     <div className="space-y-6 animate-fade-in max-w-2xl mx-auto pb-12 pt-8">
-      <Card className="shadow-sm border-t-4 border-t-primary">
+      <Card className="shadow-sm border-t-4 border-t-blue-600 dark:border-t-blue-500">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-primary">Sobre o Conversor NAS</CardTitle>
+          <CardTitle className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+            Sobre o Conversor SAN
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+        <CardContent className="space-y-4 text-slate-700 dark:text-slate-300 leading-relaxed">
           <p>
-            O <strong>Conversor NAS (Neonatal Abstinence Syndrome)</strong> é uma ferramenta de
+            O <strong>Conversor SAN (Síndrome de Abstinência Neonatal)</strong> é uma ferramenta de
             suporte à decisão clínica desenvolvida para pediatras e neonatologistas.
           </p>
           <p>
@@ -36,8 +38,14 @@ export default function About() {
             prescrever a medicação.
           </p>
 
-          <div className="mt-8 text-xs text-muted-foreground text-center">
-            Versão 1.0.0 &copy; 2026. Feito para uso interno ou profissional guiado.
+          <div className="mt-8 flex flex-col gap-2 text-xs text-muted-foreground text-center border-t pt-6">
+            <p className="font-semibold text-slate-800 dark:text-slate-300 text-sm">
+              Unidade Neonatal - Hospital Júlia Kubitischek - FHEMIG
+            </p>
+            <p>Elaborador: [Nome do Elaborador]</p>
+            <p className="mt-2">
+              Versão 1.0.0 &copy; 2026. Feito para uso interno ou profissional guiado.
+            </p>
           </div>
         </CardContent>
       </Card>

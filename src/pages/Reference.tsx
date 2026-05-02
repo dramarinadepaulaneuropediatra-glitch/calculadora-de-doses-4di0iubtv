@@ -13,19 +13,21 @@ import { Info } from 'lucide-react'
 export default function Reference() {
   return (
     <div className="space-y-8 animate-fade-in max-w-4xl mx-auto pb-12">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold tracking-tight text-primary">
+      <div className="flex flex-col gap-2">
+        <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
           Tabela de Conversão & Fatores
         </h2>
-        <p className="text-muted-foreground">
-          Fatores equianalgésicos utilizados pelo algoritmo da calculadora.
+        <p className="text-slate-500 dark:text-slate-400">
+          Fatores equianalgésicos utilizados pelo algoritmo da calculadora para tratamento de SAN.
         </p>
       </div>
 
-      <Alert className="bg-sky-50 border-sky-200">
-        <Info className="h-4 w-4 text-sky-600" />
-        <AlertTitle className="text-sky-800">Padrão de Referência</AlertTitle>
-        <AlertDescription className="text-sky-700">
+      <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900">
+        <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        <AlertTitle className="text-blue-800 dark:text-blue-300 font-semibold">
+          Padrão de Referência
+        </AlertTitle>
+        <AlertDescription className="text-blue-700 dark:text-blue-400 mt-1">
           Todas as conversões passam por uma base comum: <strong>Morfina IV (1 mg)</strong>. O
           sistema calcula a dose diária total, converte para o equivalente em Morfina IV e depois
           converte para o medicamento alvo.
