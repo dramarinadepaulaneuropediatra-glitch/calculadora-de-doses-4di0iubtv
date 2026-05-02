@@ -31,10 +31,13 @@ export default function Layout() {
               </p>
             </div>
             <div className="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400">
-              <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">
-                Unidade Neonatal - Hospital Júlia Kubitschek - FHEMIG
+              <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm text-center">
+                Unidade Neonatal - Hospital Júlia Kubitischek - FHEMIG
               </p>
-              <p>Elaborador: [Nome do Elaborador]</p>
+              <p className="text-center px-4">
+                Elaborado por: Marina de Paula Lima Oliveira (médica pediatra e neuropediatra da
+                Unidade Neonatal do Hospital Júlia Kubitischek - FHEMIG)
+              </p>
             </div>
           </div>
         </footer>

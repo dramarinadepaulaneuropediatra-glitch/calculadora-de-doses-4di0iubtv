@@ -38,11 +38,29 @@ export default function About() {
             prescrever a medicação.
           </p>
 
+          <Separator className="my-6" />
+
+          <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+            Fontes de Referência
+          </h3>
+          <ul className="list-disc list-inside text-sm space-y-1 ml-2 mt-2 text-slate-700 dark:text-slate-300">
+            <li>OpenEvidence</li>
+            <li>Pediatrics</li>
+            <li>Neofax</li>
+            <li>JAMA</li>
+            <li>Scielo</li>
+            <li>Pubmed</li>
+            <li>Current</li>
+          </ul>
+
           <div className="mt-8 flex flex-col gap-2 text-xs text-muted-foreground text-center border-t pt-6">
             <p className="font-semibold text-slate-800 dark:text-slate-300 text-sm">
               Unidade Neonatal - Hospital Júlia Kubitischek - FHEMIG
             </p>
-            <p>Elaborador: [Nome do Elaborador]</p>
+            <p>
+              Elaborado por: Marina de Paula Lima Oliveira (médica pediatra e neuropediatra da
+              Unidade Neonatal do Hospital Júlia Kubitischek - FHEMIG)
+            </p>
             <p className="mt-2">
               Versão 1.0.0 &copy; 2026. Feito para uso interno ou profissional guiado.
             </p>
